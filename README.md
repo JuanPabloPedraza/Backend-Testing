@@ -127,6 +127,90 @@ y poder correrlo localmente para desarollo de nuevas funcionalidades o testing.
 > especificado en el comando con el que se ejecutó el script del test.
 > 
 
+### Como integrar CI/CD:
+- Una forma de realizarlo es mediante la combinación de GitHub Actions y repository_dispatch para desencadenar workflows en  diferentes repositorios.
+
+1.	Repositorio X (Donde está el Código a Desplegar):
+•	Configurar un archivo de flujo de trabajo (por ejemplo, .github/workflows/ci-cd.yml) que incluya pasos para construir y desplegar la aplicación. Este flujo de trabajo puede ejecutar las pruebas y realizar el despliegue en la rama master (o cualquier otra rama).
+2.	Repositorio Y (Donde Están las Pruebas):
+•	Configura un archivo de flujo de trabajo (por ejemplo, .github/workflows/run-tests.yml) que incluya pasos para ejecutar las pruebas. Agrega un paso adicional que envíe un evento repository_dispatch al repositorio X cuando las pruebas sean exitosas.
+
+>- A continuación, ejemplos de cómo podrían verse estos archivos:
+#### Archivo .github/workflows/ci-cd.yml en Repositorio X:
+
+```yaml
+    name: CI/CD Pipeline
+
+    on:
+      push:
+        branches:
+          - master
+    
+    jobs:
+      deploy:
+        runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v2
+
+    - name: Install Dependencies
+      run: |
+        # Instalar dependencias, si es necesario
+        npm install
+
+    - name: Run Tests
+      run: |
+        # Ejecutar pruebas
+        npm test
+
+    - name: Deploy to Production
+      run: |
+        # Lógica para realizar el despliegue a producción
+        # ...
+
+    # Otros pasos de despliegue, notificaciones, etc.
+```
+#### Archivo .github/workflows/run-tests.yml en Repositorio Y:
+
+```yaml
+    name: Run Tests
+    
+    on:
+      push:
+        branches:
+          - main
+    
+    jobs:
+      test:
+        runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v2
+
+    - name: Install Dependencies
+      run: |
+        # Instalar dependencias, si es necesario
+        npm install
+
+    - name: Run Tests
+      run: |
+        # Ejecutar pruebas
+        npm test
+
+    - name: Dispatch Approval Event
+      run: |
+        # Enviar un evento repository_dispatch al Repositorio X si las pruebas son exitosas
+        curl -X POST \
+          -H "Accept: application/vnd.github.everest-preview+json" \
+          -H "Authorization: token TU_TOKEN_DE_ACCESO" \
+          --data '{"event_type": "deploy"}' \
+          https://api.github.com/repos/usuario/repo-despliegue/dispatches
+      if: success() # Este paso se ejecutará solo si las pruebas son exitosas
+```
+
+
 ## License
 
 MIT
