@@ -58,6 +58,19 @@ y poder correrlo localmente para desarollo de nuevas funcionalidades o testing.
 > PS C:\Users\you_user> allure --version
 > 2.20.1
 
+> #### Crear el archivo `.env`
+
+> 1. Crea un archivo llamado `.env` en la raíz del proyecto.
+
+> Configurar el archivo `.env`
+
+> 2. Abre el archivo `.env` y agrega las siguientes líneas:
+
+>   ```env
+>   # Archivo .env
+>   # Token de acceso
+>   API_TOKEN=your_api_token_here
+
 ### Instalación
 
 >
